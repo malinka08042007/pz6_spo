@@ -100,6 +100,10 @@ form.addEventListener("submit", async (event) => {
 
 async function loadTickets() {
     loading.hidden = false;
+    
+    const statTotal = document.getElementById("stat-total");
+    const statProgress = document.getElementById("stat-progress");
+    const statDone = document.getElementById("stat-done");
     const params = new URLSearchParams();
     if (filter.value) {
         params.set("status", filter.value);
@@ -109,6 +113,13 @@ async function loadTickets() {
 
     try {
         const tickets = await apiRequest(url);
+        
+        if (statTotal) {
+            statTotal.textContent = tickets.length;
+            statProgress.textContent = tickets.filter(t => t.status === "progress").length;
+            statDone.textContent = tickets.filter(t => t.status === "done").length;
+        }
+
         list.replaceChildren();
 
         if (tickets.length === 0) {
@@ -127,6 +138,20 @@ async function loadTickets() {
 
             const controls = document.createElement("div");
             controls.className = "d-flex align-items-center gap-2";
+            
+            const statusBadge = document.createElement("span");
+            statusBadge.className = "badge me-2 text-white";
+            
+            if (ticket.status === "new") {
+                statusBadge.classList.add("bg-secondary");
+                statusBadge.textContent = "Новая";
+            } else if (ticket.status === "progress") {
+                statusBadge.classList.add("bg-primary");
+                statusBadge.textContent = "В работе";
+            } else if (ticket.status === "done") {
+                statusBadge.classList.add("bg-success");
+                statusBadge.textContent = "Выполнена";
+            }
 
             const btnStatus = document.createElement("button");
             btnStatus.className = "btn btn-sm btn-outline-primary";
@@ -189,7 +214,7 @@ async function loadTickets() {
                 }
             };
 
-            controls.append(btnStatus, statusSelect, btnDelete);
+            controls.append(statusBadge, btnStatus, statusSelect, btnDelete);
             row.append(title, controls);
             list.append(row);
         }
