@@ -39,7 +39,7 @@ async function apiRequest(url, options = {}) {
 }
 
 async function changeStatus(ticketId, newStatus) {
-    await apiRequest(`/api/tickets/${ticketId}/`, {
+    await apiRequest(`/tickets/api/tickets/${ticketId}/`, {
         method: "PATCH",
         body: JSON.stringify({ status: newStatus })
     });
@@ -50,7 +50,7 @@ async function deleteTicket(ticketId, ticketTitle) {
     const confirmed = confirm(`Удалить заявку «${ticketTitle}»?`);
     if (!confirmed) return;
 
-    await apiRequest(`/api/tickets/${ticketId}/`, {
+    await apiRequest(`/tickets/api/tickets/${ticketId}/`, {
         method: "DELETE"
     });
     await loadTickets();
@@ -70,7 +70,7 @@ function showMessage(text, isError = false) {
 }
 
 async function loadCategories() {
-    const categories = await apiRequest("/api/categories/");
+    const categories = await apiRequest("/tickets/api/categories/");
     categorySelect.replaceChildren();
     for (const category of categories) {
         const option = document.createElement("option");
@@ -83,7 +83,7 @@ async function loadCategories() {
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
     try {
-        await apiRequest("/api/tickets/", {
+        await apiRequest("/tickets/api/tickets/", {
             method: "POST",
             body: JSON.stringify({
                 title: titleInput.value,
@@ -109,7 +109,7 @@ async function loadTickets() {
         params.set("status", filter.value);
     }
     const query = params.toString();
-    const url = "/api/tickets/" + (query ? "?" + query : "");
+    const url = "/tickets/api/tickets/" + (query ? "?" + query : "");
 
     try {
         const tickets = await apiRequest(url);
