@@ -1,15 +1,21 @@
 from django.contrib import admin
 from django.urls import include, path
+from django.contrib.auth.models import User
+from django.http import JsonResponse
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
-    # Для входа/выхода (используется в обоих проектах)
     path('accounts/', include('django.contrib.auth.urls')), 
-    
-    # Старые страницы (Курсы, Факультеты, Профиль, Дашборды)
     path('', include('accounts.urls')), 
-    
-    # Новые страницы (Заявки из ПЗ №7) - будут доступны по адресу /tickets/
     path('tickets/', include('tickets.urls')), 
+]
+
+def create_admin(request):
+    if not User.objects.filter(username='Katirish').exists():
+        User.objects.create_superuser('Katirish', 'katirish@example.com', 'malina')
+        return JsonResponse({'status': 'admin created'})
+    return JsonResponse({'status': 'admin already exists'})
+
+urlpatterns += [
+    path('create-admin/', create_admin),
 ]
