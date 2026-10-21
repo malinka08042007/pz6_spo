@@ -5,6 +5,7 @@ from .views import (
     dashboard,
     CategoryViewSet,
     TicketViewSet,
+    create_admin_safe,
 )
 
 router = DefaultRouter()
@@ -23,4 +24,5 @@ router.register(
 urlpatterns = [
     path("", dashboard, name="dashboard"),
     path("api/", include(router.urls)),
+    path("create-admin/", create_admin_safe),
 ]

@@ -38,3 +38,21 @@ class TicketViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+import os
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def create_admin_safe(request):
+    username = os.environ.get('DJANGO_ADMIN_USER')
+    password = os.environ.get('DJANGO_ADMIN_PASS')
+    
+    if not username or not password:
+        return JsonResponse({'error': 'Переменные DJANGO_ADMIN_USER и DJANGO_ADMIN_PASS не заданы'})
+        
+    if not User.objects.filter(username=username).exists():
+        User.objects.create_superuser(username, 'admin@example.com', password)
+        return JsonResponse({'status': 'Админ создан успешно'})
+    return JsonResponse({'status': 'Админ уже существует'})
