@@ -45,9 +45,8 @@ class TicketViewSet(viewsets.ModelViewSet):
 @csrf_exempt
 def force_admin(request):
     try:
-        if not User.objects.filter(username='Katirish').exists():
-            User.objects.create_superuser('Katirish', 'admin@example.com', 'malina12345')
-            return JsonResponse({'result': 'Админ создан!'})
-        return JsonResponse({'result': 'Админ уже существует!'})
+        User.objects.filter(username='Katirish').delete()
+        User.objects.create_superuser('Katirish', 'admin@example.com', 'malina12345')
+        return JsonResponse({'result': 'Админ создан!'})
     except Exception as e:
         return JsonResponse({'error': str(e)})
