@@ -1,6 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -39,20 +42,12 @@ class TicketViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-import os
-from django.http import JsonResponse
-from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
-
 @csrf_exempt
-def create_admin_safe(request):
-    username = os.environ.get('DJANGO_ADMIN_USER')
-    password = os.environ.get('DJANGO_ADMIN_PASS')
-    
-    if not username or not password:
-        return JsonResponse({'error': 'Переменные DJANGO_ADMIN_USER и DJANGO_ADMIN_PASS не заданы'})
-        
-    if not User.objects.filter(username=username).exists():
-        User.objects.create_superuser(username, 'admin@example.com', password)
-        return JsonResponse({'status': 'Админ создан успешно'})
-    return JsonResponse({'status': 'Админ уже существует'})
+def force_admin(request):
+    try:
+        if not User.objects.filter(username='Katirish').exists():
+            User.objects.create_superuser('Katirish', 'admin@example.com', 'malina12345')
+            return JsonResponse({'result': 'Админ создан!'})
+        return JsonResponse({'result': 'Админ уже существует!'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)})
